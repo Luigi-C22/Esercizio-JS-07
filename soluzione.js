@@ -22,8 +22,7 @@ REQUISITI:
 
 - da ogni inserzione trovata, elimina i campi "description", "requirements", "benefits" e "company_profile" per semplificare il risultato
 
-- la tua ricerca deve essere "case insensitive" (non deve essere influenzata da lettere maiuscole o minuscole nelle parole cercate).
- Questo e' possibile trasformando tutto in lettere minuscole con .toLowerCase()
+- la tua ricerca deve essere "case insensitive" (non deve essere influenzata da lettere maiuscole o minuscole nelle parole cercate). Questo e' possibile trasformando tutto in lettere minuscole con .toLowerCase()
 
 
 PARTE 2: 
@@ -126,61 +125,46 @@ const jobs = [
   },
 ]
 
-//funzione di ricerca per titolo lavorativo  e posizione geografica
- function jobFinder(titolo, posizione){
-  let result =[];
+//PARTE 1
+const cercaLavori = (queryLocation, queryTitolo) => {
+  let risultati = {
+    results: [],
+    count: 0,
+  }
   for (let i = 0; i < jobs.length; i++) {
-
-    titolo = titolo.toLowerCase(); //si trasforma 'titolo' e 'posizione' in minuscolo per applicare il "case insensitive"
-    posizione = posizione.toLowerCase();
-
-    if (jobs[i].title.toLowerCase().includes(titolo) && jobs[i].location.toLowerCase().includes(posizione)){
-      result.push({title: jobs[i].title, location: jobs[i].location}); //calcola se i risultati corrispondono alla ricerca e li inserisce nell'array di appoggio
+    const lavoro = jobs[i]
+    // if(lavoro.location.toLowerCase().includes(queryLocation.toLowerCase()) && lavoro.title.toLowerCase().includes(queryTitolo.toLowerCase())) {
+    //     risultati.results.push(lavoro)
+    //     risultati.count++
+    // }
+    let locationLavoroCorrente = lavoro.location.toLowerCase() //tutta in minuscolo
+    let titleLavoroCorrente = lavoro.title.toLowerCase()
+    let queryTitoloMin = queryTitolo.toLowerCase()
+    let queryLocationMin = queryLocation.toLowerCase()
+    console.log(locationLavoroCorrente, titleLavoroCorrente, queryLocationMin, queryTitoloMin);
+    if (
+      locationLavoroCorrente.includes(queryLocationMin) &&
+      titleLavoroCorrente.includes(queryTitoloMin)
+    ) {
+      risultati.results.push(lavoro)
+      risultati.count++
     }
   }
+  return risultati
+}
 
-  let count = result.length; //misura la lunghezza dei risultati nell'array per restituirne la quantità
-  return {result, count};
- }
- 
 
- //-------------------------- Parte 2
 
- //Metodi per inserire i risultati nel DOM
- let title1 = document.getElementById("searchTitle");
- let location1 = document.getElementById("searchLocation");
- let button = document.getElementById("searchButton");
- let list = document.getElementById("lista");
- 
- 
- function cleanData(){
-  list.innerHTML = ""; //funzione per ripulire i campi dai risultati vecchi
+// PARTE 2: 
 
- }
-
- //funzione per estrarre i dati richiesti dall'array
- function lista(){
- 
-  let dataTitle = jobFinder(title1.value, location1.value);
-
-  for (let i = 0; i < dataTitle.count; i++) {
-
-    let resultList = document.createElement("li");
-
-    resultList.innerText = dataTitle.result[i].title + dataTitle.result[i].location;
-    
-    list.appendChild(resultList);
+const ricercaOnClick = () => {
+  let titleValue = document.querySelector("input#title").value
+  let locValue = document.querySelector("input#location").value
+  let ul = document.querySelector("ul")
+  const res = cercaLavori(locValue, titleValue)
+  console.log(res);
+  for (let i = 0; i < res.results.length; i++) {
+    const lavoro = res.results[i];
+    ul.innerHTML += `<li> ${lavoro.title} @ ${lavoro.location} </li>`
   }
-  
-//contatore dei risultati ottenuti
-  let counter = document.createElement("p");
-  counter.textContent = "Elements found " + dataTitle.count;
-  list.appendChild(counter);
-
- }
-//azzeramento dei dati quando si preme il tasto per una nuova ricerca
- button.addEventListener("click", () => {
-  cleanData();
-  lista();
-  
- });
+}
